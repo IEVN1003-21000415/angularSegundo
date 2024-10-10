@@ -1,0 +1,59 @@
+<div class="container mx-auto max-w-md bg-white p-6 rounded-lg shadow-lg">
+    <div class="form-container">
+      <h3 class="text-lg font-semibold mb-4">Datos Personales</h3>
+      <form [formGroup]="form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          <input formControlName="nombre" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Apellido Paterno</label>
+          <input formControlName="apaterno" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Apellido Materno</label>
+          <input formControlName="amaterno" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Fecha de nacimiento</label>
+          <div class="grid grid-cols-3 gap-2">
+            <input formControlName="dia" type="number" placeholder="Día" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <input formControlName="mes" type="number" placeholder="Mes" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <input formControlName="anio" type="number" placeholder="Año" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Sexo</label>
+          <div class="flex space-x-4 mt-2">
+            <label class="inline-flex items-center">
+              <input formControlName="sexo" type="radio" value="Masculino" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-2">Masculino</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input formControlName="sexo" type="radio" value="Femenino" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-2">Femenino</span>
+            </label>
+          </div>
+        </div>
+  
+        <div class="flex justify-end">
+          <button type="button" (click)="calcularEdadYSigno()" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-500">Imprimir</button>
+        </div>
+      </form>
+    </div>
+  
+    <div class="output-container mt-6 p-4 bg-gray-100 rounded-lg shadow-lg" *ngIf="age && chineseZodiac">
+      <h3 class="text-lg font-semibold">Hola <strong>{{ form.value.nombre }} {{ form.value.apaterno }} {{ form.value.amaterno }}</strong></h3>
+      <p class="mt-2">Tienes <strong>{{ age }}</strong> años</p>
+      <p class="mt-2">Tu signo zodiacal chino es:</p>
+      <div class="flex items-center mt-4">
+        <img [src]="zodiacImage" alt="Signo chino de {{ chineseZodiac }}" class="w-16 h-16 mr-4">
+        <p class="text-lg"><strong>{{ chineseZodiac }}</strong></p>
+      </div>
+    </div>
+  </div>
+  
