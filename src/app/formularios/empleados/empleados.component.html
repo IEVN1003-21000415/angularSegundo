@@ -1,0 +1,83 @@
+<div class="container mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+  <h2 class="title text-xl font-semibold text-center mb-6">Registro de Empleados</h2>
+
+  <form class="form grid grid-cols-2 gap-4">
+    <div class="col-span-1">
+      <div class="input-group mb-4">
+        <label for="matricula" class="label block">Matrícula</label>
+        <input type="text" id="matricula" class="input mt-1" [(ngModel)]="matricula" name="matricula">
+      </div>
+
+      <div class="input-group mb-4">
+        <label for="nombre" class="label block">Nombre</label>
+        <input type="text" id="nombre" class="input mt-1" [(ngModel)]="nombre" name="nombre">
+      </div>
+
+      <div class="input-group mb-4">
+        <label for="correo" class="label block">Correo</label>
+        <input type="email" id="correo" class="input mt-1" [(ngModel)]="correo" name="correo">
+      </div>
+
+      <div class="input-group mb-4">
+        <label for="edad" class="label block">Edad</label>
+        <input type="number" id="edad" class="input mt-1" [(ngModel)]="edad" name="edad">
+      </div>
+
+      <div class="input-group mb-4">
+        <label for="horasTrabajadas" class="label block">Horas Trabajadas</label>
+        <input type="number" id="horasTrabajadas" class="input mt-1" [(ngModel)]="horasTrabajadas" name="horasTrabajadas">
+      </div>
+
+      <div class="button-group mb-4">
+        <button class="btn bg-grey-500" (click)="agregarEmpleado()">Registrar</button>
+      </div>
+    </div>
+
+    <!-- Tabla de empleados -->
+    <div class="col-span-1">
+      <button class="btn bg-gray-500 mb-4">Imprimir tabla</button>
+      
+      <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+          <tr>
+            <th class="border border-gray-300 p-2">matricula</th>
+            <th class="border border-gray-300 p-2">nombre</th>
+            <th class="border border-gray-300 p-2">correo</th>
+            <th class="border border-gray-300 p-2">edad</th>
+            <th class="border border-gray-300 p-2">horas trabajadas</th>
+            <th class="border border-gray-300 p-2">Horas x pagar</th>
+            <th class="border border-gray-300 p-2">Horas extras</th>
+            <th class="border border-gray-300 p-2">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let empleado of empleados">
+            <td class="border border-gray-300 p-2">{{ empleado.matricula }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.nombre }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.correo }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.edad }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.horasTrabajadas }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.horasxpagar }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.extras / 140}}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.subtotal }}</td>
+            <td class="border border-gray-300 p-2">{{ empleado.total }}</td>
+            
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7" class="border border-gray-300 p-2 text-right font-bold">Total a Pagar</td>
+            <td class="border border-gray-300 p-2">{{ calcularTotalPagos() }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </form>
+
+  <div class="button-group mt-4">
+    <button class="btn bg-purple-500" (click)="modificarEmpleado()">Modificar</button>
+    <br>
+    <br>
+    <button class="btn bg-purple-500" (click)="eliminarEmpleado()">Eliminar</button>
+  </div>
+</div>
