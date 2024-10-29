@@ -1,118 +1,131 @@
-import { Component} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'
-
-
+import { Component, OnInit } from '@angular/core'; 
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+ 
+interface Empleado {
+  matricula: string;
+  nombre: string;
+  correo: string;
+  edad: number;
+  horasTrabajadas: number;
+  sueldo: number;
+  horasPorPagar: number;
+  horasExtras: number;
+  subtotal: number;
+}
+ 
 @Component({
   selector: 'app-empleados',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './empleados.component.html',
-  styleUrl: './empleados.component.css'
+  styleUrls: ['./empleados.component.css']
 })
-export default class EmpleadosComponent {
-  matricula: string = '';
-  nombre: string = '';
-  correo: string = '';
-  edad: number | null = null;
-  horasTrabajadas: number | null = null;
-  empleados: any[] = [];
-
-  agregarEmpleado() {
-    if (this.matricula && this.nombre && this.correo && this.edad && this.horasTrabajadas !== null) {
-      const { horasxpagar, extras, total, subtotal } = this.calcularPago(this.horasTrabajadas);
-      const empleado = {
-        matricula: this.matricula,
-        nombre: this.nombre,
-        correo: this.correo,
-        edad: this.edad,
-        horasTrabajadas: this.horasTrabajadas,
-        horasxpagar, 
-        extras,
-        subtotal,
-        total
-      };
-      this.empleados.push(empleado);
-      this.guardarEnLocalStorage();
-      this.resetForm();
+export default class EmpleadosComponent implements OnInit {
+  formGroup!: FormGroup;
+  empleados: Empleado[] = [];
+  total: number = 0;
+  mostrarTabla: boolean = false;  
+ 
+  constructor(private readonly fb: FormBuilder) {}
+ 
+  ngOnInit() {
+    this.formGroup = this.initForm();
+    this.cargarEmpleados();
+    if (this.empleados.length > 0) {
+      this.mostrarTabla = true;
     }
   }
-
-  modificarEmpleado() {
-    const index = this.empleados.findIndex(emp => emp.matricula === this.matricula);
+ 
+  initForm(): FormGroup {
+    return this.fb.group({
+      matricula: [''],
+      nombre: [''],
+      correo: [''],
+      edad: [''],
+      horasTrabajadas: ['']
+    });
+  }
+ 
+  modificarEmpleado(): void {
+    const matricula = this.formGroup.value.matricula;
+    const empleado = this.empleados.find(emp => emp.matricula === matricula);
+ 
+    if (empleado) {
+      this.formGroup.patchValue(empleado);
+    } else {
+      alert('Empleado no encontrado');
+    }
+  }
+ 
+  registrarEmpleado(): void {
+    const { matricula, nombre, correo, edad, horasTrabajadas } = this.formGroup.value;
+   
+    const horasPorPagar = horasTrabajadas > 40 ? 40 : horasTrabajadas;
+    const horasExtras = horasTrabajadas > 40 ? horasTrabajadas - 40 : 0;
+    const subtotal = horasPorPagar * 70 + horasExtras * 140;
+ 
+    const nuevoEmpleado: Empleado = {
+      matricula,
+      nombre,
+      correo,
+      edad,
+      horasTrabajadas,
+      sueldo: subtotal,
+      horasPorPagar,
+      horasExtras,
+      subtotal
+    };
+ 
+    const index = this.empleados.findIndex(emp => emp.matricula === matricula);
+ 
     if (index !== -1) {
-      const { horasxpagar, extras, total, subtotal } = this.calcularPago(this.horasTrabajadas!);
-      this.empleados[index] = {
-        matricula: this.matricula,
-        nombre: this.nombre,
-        correo: this.correo,
-        edad: this.edad,
-        horasTrabajadas: this.horasTrabajadas,
-        horasxpagar,
-        extras,
-        subtotal,
-        total
-      };
-      this.guardarEnLocalStorage();
-      this.resetForm();
+      this.empleados[index] = nuevoEmpleado;
+    } else {
+      this.empleados.push(nuevoEmpleado);
+    }
+ 
+    this.guardarEmpleados();
+    this.formGroup.reset();
+    this.total = this.calcularTotal();
+    this.mostrarTabla = true;  //  la tabla después de registrar el primer empleado
+  }
+ 
+  eliminarEmpleado(): void {
+    const matricula = this.formGroup.value.matricula;
+    const index = this.empleados.findIndex(emp => emp.matricula === matricula);
+    this.empleados.splice(index, 1);
+    this.guardarEmpleados();
+    this.formGroup.reset();
+    this.total = this.calcularTotal();
+  }
+ 
+  buscarEmpleado(matricula: string): void {
+    const empleado = this.empleados.find(emp => emp.matricula === matricula);
+    if (empleado) {
+      this.formGroup.patchValue(empleado);
     } else {
       alert("Empleado no encontrado");
     }
   }
-
-  eliminarEmpleado() {
-    this.empleados = this.empleados.filter(emp => emp.matricula !== this.matricula);
-    this.guardarEnLocalStorage();
+ 
+  imprimirEmpleados(): void {
+    this.mostrarTabla = true;
+    this.total = this.calcularTotal();
   }
-
-
-  calcularPago(horas: number) {
-    const tarifaNormal = 70;
-    const tarifaExtra = 140;
-    
-    // Calcular horas normales y horas extras
-    let horasNormales = horas > 40 ? 40 : horas;
-    let horasExtras = horas > 40 ? horas - 40 : 0;
-    
-   
-    let horasxpagar = horasNormales * tarifaNormal;
-    
-    
-    let subtotal = horasxpagar; 
-    
-    
-    let extras = horasExtras * tarifaExtra;
-    
-    let total = subtotal + extras; 
-
-    return { horasxpagar, extras, subtotal, total };
+ 
+  calcularTotal(): number {
+    return this.empleados.reduce((total, empleado) => total + empleado.subtotal, 0);
   }
-
-  calcularTotalPagos(): number {
-    return this.empleados.reduce((acc, empleado) => acc + empleado.total, 0);
-  }
-
-  guardarEnLocalStorage() {
+ 
+  guardarEmpleados(): void {
     localStorage.setItem('empleados', JSON.stringify(this.empleados));
   }
-
-  cargarDesdeLocalStorage() {
-    const data = localStorage.getItem('empleados');
-    if (data) {
-      this.empleados = JSON.parse(data);
+ 
+  cargarEmpleados(): void {
+    const empleadosGuardados = localStorage.getItem('empleados');
+    if (empleadosGuardados) {
+      this.empleados = JSON.parse(empleadosGuardados);
     }
-  }
-
-  ngOnInit() {
-    localStorage.removeItem('empleados');
-    this.empleados = [];
-  }
-
-  resetForm() {
-    this.matricula = '';
-    this.nombre = '';
-    this.correo = '';
-    this.edad = null;
-    this.horasTrabajadas = null;
   }
 }
